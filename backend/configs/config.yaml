@@ -1,0 +1,21 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+
+database:
+  host: "localhost"
+  port: 5432
+  user: "postgres"
+  password: "postgres123"
+  name: "openmessenger"
+  sslmode: "disable"
+
+redis:
+  host: "localhost"
+  port: 6379
+
+minio:
+  endpoint: "localhost:9000"
+  access_key: "admin"
+  secret_key: "admin123456"
+  use_ssl: false
