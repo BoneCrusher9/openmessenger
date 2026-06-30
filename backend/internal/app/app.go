@@ -12,6 +12,8 @@ import (
 
 	"github.com/BoneCrusher9/openmessenger/backend/internal/config"
 	"github.com/BoneCrusher9/openmessenger/backend/internal/database"
+	"github.com/BoneCrusher9/openmessenger/backend/internal/repository"
+	"github.com/BoneCrusher9/openmessenger/backend/internal/service"
 	transporthttp "github.com/BoneCrusher9/openmessenger/backend/internal/transport/http"
 )
 
@@ -31,7 +33,11 @@ func New(cfg *config.Config, logger *slog.Logger) (*App, error) {
 
 	logger.Info("connected to PostgreSQL")
 
-	router := transporthttp.New(logger)
+	userRepository := repository.NewUserRepository(db)
+	userService := service.NewUserService(userRepository)
+	handler := transporthttp.NewHandler(userService)
+
+	router := transporthttp.New(logger, handler)
 
 	addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
 

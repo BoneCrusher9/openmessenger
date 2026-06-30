@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func New(logger *slog.Logger) *gin.Engine {
+func New(logger *slog.Logger, handler *Handler) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 
 	router := gin.New()
@@ -16,7 +16,7 @@ func New(logger *slog.Logger) *gin.Engine {
 		LoggerMiddleware(logger),
 	)
 
-	RegisterRoutes(router)
+	handler.RegisterRoutes(router)
 
 	return router
 }

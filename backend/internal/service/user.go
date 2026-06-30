@@ -17,7 +17,13 @@ var (
 )
 
 type UserService interface {
-	Register(ctx context.Context, username, email, password string) (*domain.User, error)
+	Register(
+		ctx context.Context,
+		username string,
+		displayName string,
+		email string,
+		password string,
+	) (*domain.User, error)
 }
 
 type userService struct {
@@ -30,15 +36,19 @@ func NewUserService(users repository.UserRepository) UserService {
 	}
 }
 
-func (s *userService) Register(ctx context.Context, username, email, password string) (*domain.User, error) {
+func (s *userService) Register(
+	ctx context.Context,
+	username string,
+	displayName string,
+	email string,
+	password string,
+) (*domain.User, error) {
 
-	// 1. Проверяем, существует ли пользователь
 	existing, err := s.users.GetByEmail(ctx, email)
 	if err == nil && existing != nil {
 		return nil, ErrUserAlreadyExists
 	}
 
-	// 2. Хешируем пароль
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
@@ -47,15 +57,17 @@ func (s *userService) Register(ctx context.Context, username, email, password st
 	now := time.Now()
 
 	user := &domain.User{
-		ID:           uuid.New(),
+		ID:           uuid.New().String(),
 		Username:     username,
+		DisplayName:  displayName,
 		Email:        email,
 		PasswordHash: string(hash),
+		AvatarURL:    "",
+		About:        "",
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
 
-	// 3. Сохраняем в БД
 	if err := s.users.Create(ctx, user); err != nil {
 		return nil, err
 	}
